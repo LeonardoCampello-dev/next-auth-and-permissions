@@ -6,6 +6,7 @@ import { AuthContext } from '../contexts'
 
 import styles from '../styles/Home.module.css'
 import { CookiesEnum } from '../types'
+import { withSSRGuest } from '../utils/ssr/with-ssr-guest'
 
 const Home: NextPage = () => {
   const [email, setEmail] = useState<string>('')
@@ -33,19 +34,8 @@ const Home: NextPage = () => {
 
 export default Home
 
-export const getServerSideProps: GetServerSideProps = async context => {
-  const cookies = parseCookies(context)
-
-  if (cookies[CookiesEnum.AUTH_TOKEN]) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false
-      }
-    }
-  }
-
+export const getServerSideProps = withSSRGuest(async () => {
   return {
     props: {}
   }
-}
+})
