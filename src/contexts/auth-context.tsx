@@ -1,6 +1,6 @@
-import { useRouter } from 'next/router'
+import NextRouter from 'next/router'
 
-import { setCookie, parseCookies } from 'nookies'
+import { setCookie, parseCookies, destroyCookie } from 'nookies'
 import { createContext, FC, useEffect, useState } from 'react'
 
 import { api } from '../services/api'
@@ -16,12 +16,17 @@ type AuthContextStore = {
 
 type AuthResponse = Session & User
 
+export const signOut = () => {
+  destroyCookie(undefined, CookiesEnum.AUTH_TOKEN)
+  destroyCookie(undefined, CookiesEnum.AUTH_REFRESH_TOKEN)
+
+  NextRouter.push('/')
+}
+
 export const AuthContext = createContext<AuthContextStore>({} as AuthContextStore)
 
 export const AuthProvider: FC = ({ children }) => {
   const [user, setUser] = useState<User>()
-
-  const router = useRouter()
 
   const isAuthenticated = Boolean(user)
 
@@ -50,7 +55,7 @@ export const AuthProvider: FC = ({ children }) => {
 
       api.defaults.headers['Authorization'] = generateAuthToken(token)
 
-      router.push('/dashboard')
+      NextRouter.push('/dashboard')
     } catch (error) {
       console.info(error)
     }
@@ -60,11 +65,16 @@ export const AuthProvider: FC = ({ children }) => {
     const { 'nextauth.token': token } = parseCookies()
 
     if (token) {
-      api.get<User>('/me').then(response => {
-        const { email, permissions, roles } = response.data
+      api
+        .get<User>('/me')
+        .then(response => {
+          const { email, permissions, roles } = response.data
 
-        setUser({ email, permissions, roles })
-      })
+          setUser({ email, permissions, roles })
+        })
+        .catch(() => {
+          signOut()
+        })
     }
   }, [])
 

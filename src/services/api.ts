@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios'
 
 import { parseCookies, setCookie } from 'nookies'
 
+import { signOut } from '../contexts'
 import { CookiesEnum, HttpStatusCode } from '../types/'
 import { MaxAgeEnum } from '../types/enums/max-age-enum'
 import { generateAuthToken } from '../utils/token/generate-auth-token'
@@ -78,8 +79,10 @@ api.interceptors.response.use(
           })
         })
       } else {
-        // TODO logout
+        signOut()
       }
     }
+
+    return Promise.reject(error)
   }
 )
