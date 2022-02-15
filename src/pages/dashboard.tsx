@@ -1,10 +1,16 @@
 import { NextPage } from 'next'
 
-import { Fragment, useContext } from 'react'
+import { Fragment, useContext, useEffect } from 'react'
+
 import { AuthContext } from '../contexts'
+import { api } from '../services/api'
 
 const Dashboard: NextPage = () => {
   const { user } = useContext(AuthContext)
+
+  useEffect(() => {
+    api.get('/me').then(response => console.log({ response }))
+  })
 
   return (
     <Fragment>
