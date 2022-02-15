@@ -4,27 +4,14 @@ import { setCookie, parseCookies } from 'nookies'
 import { createContext, FC, useEffect, useState } from 'react'
 
 import { api } from '../services/api'
-
-interface User {
-  email: string
-  permissions: string[]
-  roles: string[]
-}
-
-type SignInCredentials = {
-  email: string
-  password: string
-}
+import { CookiesEnum, Session, SignInCredentialsDTO, User } from '../types'
+import { MaxAgeEnum } from '../types/enums/max-age-enum'
+import { generateAuthToken } from '../utils/token/generate-auth-token'
 
 type AuthContextStore = {
   user: User
-  signIn: (credentials: SignInCredentials) => Promise<void>
+  signIn: (credentials: SignInCredentialsDTO) => Promise<void>
   isAuthenticated: boolean
-}
-
-interface Session {
-  token: string
-  refreshToken: string
 }
 
 type AuthResponse = Session & User
@@ -38,28 +25,30 @@ export const AuthProvider: FC = ({ children }) => {
 
   const isAuthenticated = Boolean(user)
 
-  const signIn = async ({ email, password }: SignInCredentials) => {
+  const signIn = async ({ email, password }: SignInCredentialsDTO) => {
     try {
-      const response = await api.post<AuthResponse>('sessions', {
+      const payload = {
         email,
         password
-      })
+      }
+
+      const response = await api.post<AuthResponse>('sessions', payload)
 
       const { permissions, roles, token, refreshToken } = response.data
 
       setUser({ email, permissions, roles })
 
-      setCookie(undefined, 'nextauth.token', token, {
-        maxAge: 60 * 60 * 24 * 30, // 30 days
+      setCookie(undefined, CookiesEnum.AUTH_TOKEN, token, {
+        maxAge: MaxAgeEnum.THIRTY_DAYS,
         path: '/'
       })
 
-      setCookie(undefined, 'nextauth.refreshToken', refreshToken, {
-        maxAge: 60 * 60 * 24 * 30, // 30 days
+      setCookie(undefined, CookiesEnum.AUTH_REFRESH_TOKEN, refreshToken, {
+        maxAge: MaxAgeEnum.THIRTY_DAYS,
         path: '/'
       })
 
-      api.defaults.headers['Authorization'] = `Bearer ${token}`
+      api.defaults.headers['Authorization'] = generateAuthToken(token)
 
       router.push('/dashboard')
     } catch (error) {
