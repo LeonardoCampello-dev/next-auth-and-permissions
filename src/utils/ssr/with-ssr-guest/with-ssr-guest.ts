@@ -1,7 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next'
 import { parseCookies } from 'nookies'
 
-import { CookiesEnum } from '../../types'
+import { CookiesEnum } from '../../../types'
 
 export const withSSRGuest = <TResult = object>(fn: GetServerSideProps<TResult>) => {
   return async (context: GetServerSidePropsContext): Promise<GetServerSidePropsResult<TResult>> => {

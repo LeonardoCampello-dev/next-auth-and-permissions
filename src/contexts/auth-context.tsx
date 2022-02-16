@@ -3,7 +3,7 @@ import NextRouter from 'next/router'
 import { setCookie, parseCookies, destroyCookie } from 'nookies'
 import { createContext, FC, useEffect, useState } from 'react'
 
-import { api } from '../services/api'
+import { api } from '../services'
 import { CookiesEnum, Session, SignInCredentialsDTO, User } from '../types'
 import { MaxAgeEnum } from '../types/enums/max-age-enum'
 import { generateAuthToken } from '../utils/token/generate-auth-token'
