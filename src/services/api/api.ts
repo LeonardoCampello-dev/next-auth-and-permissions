@@ -3,6 +3,7 @@ import axios, { AxiosError } from 'axios'
 import { parseCookies, setCookie } from 'nookies'
 
 import { signOut } from '../../contexts'
+import { AuthTokenError } from '../../errors/auth-token-error'
 import { CookiesEnum, HttpStatusCode } from '../../types'
 import { MaxAgeEnum } from '../../types/enums/max-age-enum'
 import { generateAuthToken } from '../../utils/token/generate-auth-token'
@@ -64,6 +65,8 @@ export const setupAPIClient = (context = undefined) => {
 
                 if (process.browser) {
                   signOut()
+                } else {
+                  Promise.reject(new AuthTokenError())
                 }
               })
               .finally(() => {

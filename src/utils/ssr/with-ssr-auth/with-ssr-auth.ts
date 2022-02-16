@@ -1,6 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next'
-import { parseCookies } from 'nookies'
+import { destroyCookie, parseCookies } from 'nookies'
 
+import { AuthTokenError } from '../../../errors/auth-token-error'
 import { CookiesEnum } from '../../../types'
 
 export const withSSRAuth = <TResult = object>(fn: GetServerSideProps<TResult>) => {
@@ -16,6 +17,20 @@ export const withSSRAuth = <TResult = object>(fn: GetServerSideProps<TResult>) =
       }
     }
 
-    return await fn(context)
+    try {
+      return await fn(context)
+    } catch (error) {
+      if (error instanceof AuthTokenError) {
+        destroyCookie(context, CookiesEnum.AUTH_TOKEN)
+        destroyCookie(context, CookiesEnum.AUTH_REFRESH_TOKEN)
+
+        return {
+          redirect: {
+            destination: '/',
+            permanent: false
+          }
+        }
+      }
+    }
   }
 }
