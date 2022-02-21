@@ -1,9 +1,11 @@
 .container {
+  margin-top: 10%;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  flex-direction: column;
-
-  height: 100vh;
+  h1 {
+    font-size: 4.8rem;
+  }
 }

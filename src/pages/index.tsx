@@ -1,10 +1,16 @@
 import type { NextPage } from 'next'
 
-import { FormEvent, useContext, useState } from 'react'
-import { AuthContext } from '../contexts'
+import Head from 'next/head'
+import Image from 'next/image'
 
-import styles from '../styles/Home.module.css'
+import { FormEvent, Fragment, useContext, useState } from 'react'
+
+import SecureBackgroundSVG from '../assets/secure-background.svg'
+
+import { AuthContext } from '../contexts'
 import { withSSRGuest } from '../utils/ssr'
+
+import styles from '../styles/login/login.module.scss'
 
 const Home: NextPage = () => {
   const [email, setEmail] = useState<string>('')
@@ -21,12 +27,35 @@ const Home: NextPage = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.container}>
-      <input type="email" value={email} onChange={event => setEmail(event.target.value)} />
-      <input type="password" value={password} onChange={event => setPassword(event.target.value)} />
+    <Fragment>
+      <Head>
+        <title>Login</title>
+      </Head>
 
-      <button type="submit">Entrar</button>
-    </form>
+      <div className={styles['container']}>
+        <form onSubmit={handleSubmit} className={styles['form']}>
+          <input
+            type="email"
+            placeholder="example@domain.com"
+            value={email}
+            onChange={event => setEmail(event.target.value)}
+          />
+
+          <input
+            type="password"
+            placeholder="must have at least 6 characters"
+            value={password}
+            onChange={event => setPassword(event.target.value)}
+          />
+
+          <button type="submit">Entrar</button>
+        </form>
+
+        <div className={styles['image-container']}>
+          <Image src={SecureBackgroundSVG} alt="Secure background" />
+        </div>
+      </div>
+    </Fragment>
   )
 }
 

@@ -4,11 +4,13 @@ import { Fragment } from 'react'
 import { setupAPIClient } from '../services/'
 import { withSSRAuth } from '../utils/ssr'
 
+import styles from '../styles/metrics/metrics.module.scss'
+
 const Metrics: NextPage = () => {
   return (
-    <Fragment>
+    <div className={styles['container']}>
       <h1>Metrics</h1>
-    </Fragment>
+    </div>
   )
 }
 
