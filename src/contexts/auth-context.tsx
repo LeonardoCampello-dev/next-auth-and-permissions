@@ -11,6 +11,7 @@ import { generateAuthToken } from '../utils/token/generate-auth-token'
 type AuthContextStore = {
   user: User
   signIn: (credentials: SignInCredentialsDTO) => Promise<void>
+  signOut: () => void
   isAuthenticated: boolean
 }
 
@@ -20,10 +21,14 @@ export const signOut = () => {
   destroyCookie(undefined, CookiesEnum.AUTH_TOKEN)
   destroyCookie(undefined, CookiesEnum.AUTH_REFRESH_TOKEN)
 
+  authChannel.postMessage('signOut')
+
   NextRouter.push('/')
 }
 
 export const AuthContext = createContext<AuthContextStore>({} as AuthContextStore)
+
+let authChannel: BroadcastChannel
 
 export const AuthProvider: FC = ({ children }) => {
   const [user, setUser] = useState<User>()
@@ -62,6 +67,23 @@ export const AuthProvider: FC = ({ children }) => {
   }
 
   useEffect(() => {
+    authChannel = new BroadcastChannel('auth')
+
+    authChannel.onmessage = message => {
+      switch (message.data) {
+        case 'signOut': {
+          signOut()
+
+          break
+        }
+        default: {
+          break
+        }
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     const { 'nextauth.token': token } = parseCookies()
 
     if (token) {
@@ -79,7 +101,7 @@ export const AuthProvider: FC = ({ children }) => {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ signIn, isAuthenticated, user }}>
+    <AuthContext.Provider value={{ signIn, isAuthenticated, user, signOut }}>
       {children}
     </AuthContext.Provider>
   )

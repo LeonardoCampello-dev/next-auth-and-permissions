@@ -8,7 +8,7 @@ import { api, setupAPIClient } from '../services/'
 import { withSSRAuth } from '../utils/ssr'
 
 const Dashboard: NextPage = () => {
-  const { user } = useContext(AuthContext)
+  const { user, signOut } = useContext(AuthContext)
 
   useEffect(() => {
     api
@@ -20,6 +20,8 @@ const Dashboard: NextPage = () => {
   return (
     <Fragment>
       <h1>Dashboard</h1>
+
+      <button onClick={signOut}>Sair</button>
 
       <p>{user?.email}</p>
 
