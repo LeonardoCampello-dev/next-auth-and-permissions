@@ -3,11 +3,14 @@ import { NextPage } from 'next'
 import { Fragment, useContext, useEffect } from 'react'
 
 import { AuthContext } from '../contexts'
+import { useCan } from '../hooks/useCan'
 import { api, setupAPIClient } from '../services/'
 import { withSSRAuth } from '../utils/ssr'
 
 const Dashboard: NextPage = () => {
   const { user } = useContext(AuthContext)
+
+  const userCanSeeMetrics = useCan({ roles: ['administrator', 'editor'] })
 
   useEffect(() => {
     api
@@ -25,6 +28,8 @@ const Dashboard: NextPage = () => {
       {user?.permissions.map(permission => (
         <div key={permission}>{permission}</div>
       ))}
+
+      {userCanSeeMetrics && <div>Métricas</div>}
     </Fragment>
   )
 }
